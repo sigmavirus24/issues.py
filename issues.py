@@ -1,11 +1,11 @@
 #!/usr/bin/env python
 
-from sys import version_info, exit
+from sys import version_info
 if version_info >= (3, 0):
-    print("We have not added Python 3 compatibility yet.")
-    exit(1)
-
-import urllib2
+    from urllib.request import Request, urlopen
+    from urllib.error import HTTPError
+else:
+    from urllib2 import Request, urlopen, HTTPError
 import json
 from base64 import b64encode
 
@@ -23,12 +23,12 @@ class GitHub(object):
 
     def __request__(self):
         response = None
-        self.req = urllib2.Request(self.last_url)
+        self.req = Request(self.last_url)
         if self.auth:
             self.req.add_header('Authorization', self.auth)
         try:
-            response = urllib2.urlopen(self.req)
-        except urllib2.HTTPerror as error:
+            response = urlopen(self.req)
+        except HTTPError as error:
             response = error
         self.headers = response.headers
         self.code = response.getcode()

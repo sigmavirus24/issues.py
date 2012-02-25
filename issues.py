@@ -163,11 +163,11 @@ class Issues(object):
             self.github.add_oauth(oauth_token)
 
 
-    def cache(self):
+    def cache(self, cache_dir='.'):
         if self.owner and self.project:
-            filename = '{0}-{1}.json'.format(self.owner, self.project)
+            filename = '{0}/{1}-{2}.json'.format(cache_dir, self.owner, self.project)
         elif self.user:
-            filename = '{0}.json'.format(self.user)
+            filename = '{0}/{1}.json'.format(cache_dir, self.user)
         with open(filename, 'w+') as fd:
             fd.write(self.issues.get_flat_data())
 

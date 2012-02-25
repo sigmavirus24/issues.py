@@ -8,6 +8,8 @@ in the future as well probably. It works on Python 2.6-3.x.
 
 # Dependencies
 
+None.
+
 I could have used Kenneth Reitz's great
 [requests](https://github.com/kennethreitz/requests) module for this, but I
 wanted to have as few dependencies as possible. If someone else wants to do

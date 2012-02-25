@@ -176,8 +176,8 @@ class Issues(object):
             cache_dir=None):
         if check_cache:
             from os import listdir
-            owner = owner if owner else self.owner
-            project = project if project else self.project
+            owner = owner or self.owner
+            project = project or self.project
             name = '{0}-{1}.json'.format(owner, project)
             for f in listdir(cache_dir):
                 if f == name:
@@ -189,7 +189,11 @@ class Issues(object):
             url = 'https://api.github.com/repos/{owner}/{proj}/issues'
             url.format(owner=owner, proj=project)
         self.github.request(url)
-        self.issues.parse(self.github)
+        if self.github.get_code() == 200:
+            self.issues.parse(self.github)
+        else:
+            print("{0} error: {1}.".format(self.github.get_code(),
+                self.github.get_url())
 
 
     def print_issues(self):

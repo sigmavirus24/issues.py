@@ -1,5 +1,10 @@
 #!/usr/bin/env python
 
+from sys import version_info, exit
+if version_info >= (3, 0):
+    print("We have not added Python 3 compatibility yet.")
+    exit(1)
+
 import urllib2
 import json
 from base64 import b64encode

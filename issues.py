@@ -12,14 +12,15 @@ class GitHub(object):
         if user and pw:
             b64 = b64encode(':'.join([user, pw]))
             self.auth = ' '.join(['Basic', b64])
-        else:
+        elif oauth_token:
             self.auth = ' '.join(['token', oauth_token])
 
 
     def __request__(self):
         response = None
         self.req = urllib2.Request(self.last_url)
-        self.req.add_header('Authorization', self.auth)
+        if self.auth:
+            self.req.add_header('Authorization', self.auth)
         try:
             response = urllib2.urlopen(self.req)
         except urllib2.HTTPerror as error:

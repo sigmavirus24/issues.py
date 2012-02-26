@@ -143,14 +143,17 @@ class IssuesParser(object):
                 title = self.issues_dict[n]['title']
                 author = self.issues_dict[n]['user']['login']
                 assignee = None
+
                 if self.issues_dict[n]['assignee']:
                     assignee = self.issues_dict[n]['assignee']['login']
-                labels = '@{0}'.format(assignee) if assignee else '' 
+                labels = '@{0} '.format(assignee) if assignee else '' 
                 for l in self.issues_dict[n]['labels']:
                     labels = ''.join([labels, '+', l['name'], ' '])
-                mile = self.issues_dict[n]['milestone']
-                labels = ''.join([labels, '#{', mile['title'], ' - ',
-                        str(mile['due_on']), '}'])
+
+                if self.issues_dict[n]['milestone']:
+                    mile = self.issues_dict[n]['milestone']
+                    labels = ''.join([labels, '#{', mile['title'], ' - ',
+                            str(mile['due_on']), '}'])
                 print(format_str.format(num=n, title=title, author=author,
                     extra=labels))
 

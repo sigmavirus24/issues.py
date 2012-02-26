@@ -110,6 +110,7 @@ class IssuesParser(object):
         self.structured_data = None  # The data structure returned by json.loads()
         self.issues_dict = {}  # Dictionary to keep the issues in
         self.issue_numbers = []  # Sorted list of issue numbers
+        self.formatted = []
 
         if data:
             self.parse(data)
@@ -135,8 +136,8 @@ class IssuesParser(object):
             self.__parse__(data.get_data())
 
 
-    def print_issues(self):
-        """Print the issues that were just parsed."""
+    def format_issues(self):
+        """Format the issues that were just parsed and place them in a list."""
         format_str = '{num:>3} {title} ({author}) {extra}'
         if self.issues_dict and self.issue_numbers:
             for n in self.issue_numbers:
@@ -154,8 +155,15 @@ class IssuesParser(object):
                     mile = self.issues_dict[n]['milestone']
                     labels = ''.join([labels, '#{', mile['title'], ' - ',
                             str(mile['due_on']), '}'])
-                print(format_str.format(num=n, title=title, author=author,
+                self.formatted.append(format_str.format(num=n, title=title, author=author,
                     extra=labels))
+
+
+    def print_issues(self):
+        """Print the issues."""
+        self.format_issues()
+        for issue in self.formatted:
+            print(issue)
 
 
 class Issues(object):
@@ -169,6 +177,7 @@ class Issues(object):
         self.project = None
         self.url = None
         self.my_issues = None
+        self.cached = False
 
         if owner and project:
             self.owner = owner
@@ -188,6 +197,8 @@ class Issues(object):
 
 
     def cache(self, cache_dir='.'):
+        if self.cached:
+            return
         if self.owner and self.project:
             filename = '{0}/{1}-{2}.json'.format(cache_dir, self.owner, self.project)
         elif self.user:
@@ -196,22 +207,35 @@ class Issues(object):
             fd.write(self.issues.get_flat_data())
 
 
+    def __search_for__(self, owner, project, cache_dir):
+        from os import listdir, stat
+        from time import time
+        name = '{0}-{1}.json'.format(owner, project)
+        for f in listdir(cache_dir):
+            if f == name:
+                s = stat(f)
+                s = int(time() - s.st_ctime)/60
+                if s < 60:
+                    self.cached = True
+                    return f
+        return None
+
+
     def fetch_issues(self, owner=None, project=None, check_cache=False,
             cache_dir=None):
         if check_cache:
-            from os import listdir
             owner = owner or self.owner
             project = project or self.project
-            name = '{0}-{1}.json'.format(owner, project)
-            for f in listdir(cache_dir):
-                if f == name:
-                    self.open_cache(f)
-                    return
+            f = self.__search_for__(owner, project, cache_dir)
+            if self.cached:
+                self.open_cache(f)
+                return
 
         url = None
         if owner and project:
             url = 'https://api.github.com/repos/{owner}/{proj}/issues'
             url = url.format(owner=owner, proj=project)
+
         self.github.request(url)
         if self.github.get_code() == 200:
             self.issues.parse(self.github)

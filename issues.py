@@ -138,17 +138,22 @@ class IssuesParser(object):
 
     def format_issues(self):
         """Format the issues that were just parsed and place them in a list."""
-        format_str = '{num:>3} {title} ({author}) {extra}'
+        format_str = '{num:>3}|{id} {title} ({author}) {extra}'
         if self.issues_dict and self.issue_numbers:
             for n in self.issue_numbers:
                 title = self.issues_dict[n]['title']
                 author = self.issues_dict[n]['user']['login']
                 assignee = None
+                id = 'i'
+
+                if self.issues_dict[n]['pull_request']['diff_url']:
+                    id = 'p'
 
                 if self.issues_dict[n]['assignee']:
                     assignee = self.issues_dict[n]['assignee']['login']
                 labels = '@{0} '.format(assignee) if assignee else '' 
                 for l in self.issues_dict[n]['labels']:
+                    l['name'] = l['name'].replace(' ', '_')
                     labels = ''.join([labels, '+', l['name'], ' '])
 
                 if self.issues_dict[n]['milestone']:
@@ -156,7 +161,7 @@ class IssuesParser(object):
                     labels = ''.join([labels, '#{', mile['title'], ' - ',
                             str(mile['due_on']), '}'])
                 self.formatted.append(format_str.format(num=n, title=title, author=author,
-                    extra=labels))
+                    extra=labels, id=id))
 
 
     def print_issues(self):

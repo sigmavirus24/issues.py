@@ -61,25 +61,25 @@ if __name__ == "__main__":
 
 ```shell
 sigma@virus:~/sandbox/issues.py$ example_script.py 
-  2 clint.textui.maxwidth context manager (kennethreitz) +Feature Request 
-  3 clint.resources.bundler (kennethreitz) +Feature Request 
-  4 256-color terminal support (laanwj) +Feature Request #{v0.2.4 - 2011-04-11T07:00:00Z}
-  8 examples/text_width.py only works with terminals wider than 135 chars (redtoad) 
- 10 Add underline support (kennethreitz) +Feature Request 
- 11 wrap stdout.isatty in try/except (kennethreitz) 
- 13 textui.auto_columns (kennethreitz) @kennethreitz #{v0.2.4 - 2011-04-11T07:00:00Z}
- 15 Documentation (kennethreitz) 
- 16 Background Color Support (kennethreitz) 
- 17 Underline Color Support (kennethreitz) 
- 19 added simple user input system (hunterlang) 
- 23 added colors to progress bar and progress dots (jjanyan) 
- 25 Make the width argument take into account the entire BAR_TEMPLATE, not j... (SirScott) 
- 28 clint breaks readline completion (jandd) 
- 33 data files installed in the wrong location (hannosch) 
- 35 Fix for #33 - unwanted installation of data files. (hannosch) 
- 36 Show details during a progress (GMLudo) 
- 38 Try a reimplementation of clint.textui.core (Lothiraldan) 
- 39 Windows colored text is not working (AltReality) 
- 42 Initialise colorama for textui on Windows. (takluyver) 
- 44 Fixed a typo in README.rst (mjs2600) 
+  2|i clint.textui.maxwidth context manager (kennethreitz) +Feature_Request 
+  3|i clint.resources.bundler (kennethreitz) +Feature_Request 
+  4|i 256-color terminal support (laanwj) +Feature_Request #{v0.2.4 - 2011-04-11T07:00:00Z}
+  8|i examples/text_width.py only works with terminals wider than 135 chars (redtoad) 
+ 10|i Add underline support (kennethreitz) +Feature_Request 
+ 11|i wrap stdout.isatty in try/except (kennethreitz) 
+ 13|i textui.auto_columns (kennethreitz) @kennethreitz #{v0.2.4 - 2011-04-11T07:00:00Z}
+ 15|i Documentation (kennethreitz) 
+ 16|i Background Color Support (kennethreitz) 
+ 17|i Underline Color Support (kennethreitz) 
+ 19|p added simple user input system (hunterlang) 
+ 23|p added colors to progress bar and progress dots (jjanyan) 
+ 25|p Make the width argument take into account the entire BAR_TEMPLATE, not j... (SirScott) 
+ 28|i clint breaks readline completion (jandd) 
+ 33|i data files installed in the wrong location (hannosch) 
+ 35|p Fix for #33 - unwanted installation of data files. (hannosch) 
+ 36|i Show details during a progress (GMLudo) 
+ 38|p Try a reimplementation of clint.textui.core (Lothiraldan) 
+ 39|i Windows colored text is not working (AltReality) 
+ 42|p Initialise colorama for textui on Windows. (takluyver) 
+ 44|p Fixed a typo in README.rst (mjs2600) 
 ```

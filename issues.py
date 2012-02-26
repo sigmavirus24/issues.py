@@ -145,9 +145,12 @@ class IssuesParser(object):
                 assignee = None
                 if self.issues_dict[n]['assignee']:
                     assignee = self.issues_dict[n]['assignee']['login']
-                labels = '@{0} '.format(assignee) if assignee else '' 
+                labels = '@{0}'.format(assignee) if assignee else '' 
                 for l in self.issues_dict[n]['labels']:
                     labels = ''.join([labels, '+', l['name'], ' '])
+                mile = self.issues_dict[n]['milestone']
+                labels = ''.join([labels, '#{', mile['title'], ' - ',
+                        str(mile['due_on']), '}'])
                 print(format_str.format(num=n, title=title, author=author,
                     extra=labels))
 
@@ -205,13 +208,13 @@ class Issues(object):
         url = None
         if owner and project:
             url = 'https://api.github.com/repos/{owner}/{proj}/issues'
-            url.format(owner=owner, proj=project)
+            url = url.format(owner=owner, proj=project)
         self.github.request(url)
         if self.github.get_code() == 200:
             self.issues.parse(self.github)
         else:
             print("{0} error: {1}.".format(self.github.get_code(),
-                self.github.get_url())
+                self.github.get_url()))
 
 
     def print_issues(self):

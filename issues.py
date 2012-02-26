@@ -106,6 +106,7 @@ class IssuesParser(object):
     """Handles the parsing of issues"""
 
     def __init__(self, data=None):
+        """Return an initialized IssuesParser object."""
         self.flat_data = None  # The string returned by the call to the API
         self.structured_data = None  # The data structure returned by json.loads()
         self.issues_dict = {}  # Dictionary to keep the issues in
@@ -117,6 +118,7 @@ class IssuesParser(object):
 
 
     def __parse__(self, data):
+        """Parse the data which must be a string at this point."""
         self.flat_data = data.decode()
         self.structured_data = json.loads(self.flat_data)
         for d in self.structured_data:
@@ -125,29 +127,18 @@ class IssuesParser(object):
             self.issue_numbers.sort()
 
 
-    def get_flat_data(self):
-        return self.flat_data
-
-
-    def parse(self, data):
-        if isinstance(data, str):
-            self.__parse__(data)
-        elif isinstance(data, GitHub):
-            self.__parse__(data.get_data())
-
-
     def format_issues(self):
         """Format the issues that were just parsed and place them in a list."""
-        format_str = '{num:>3}|{id} {title} ({author}) {extra}'
+        format_str = '{num:>3}|{ip} {title} ({author}) {extra}'
         if self.issues_dict and self.issue_numbers:
             for n in self.issue_numbers:
                 title = self.issues_dict[n]['title']
                 author = self.issues_dict[n]['user']['login']
                 assignee = None
-                id = 'i'
+                ip = 'i'
 
                 if self.issues_dict[n]['pull_request']['diff_url']:
-                    id = 'p'
+                    ip = 'p'
 
                 if self.issues_dict[n]['assignee']:
                     assignee = self.issues_dict[n]['assignee']['login']
@@ -160,13 +151,43 @@ class IssuesParser(object):
                     mile = self.issues_dict[n]['milestone']
                     labels = ''.join([labels, '#{', mile['title'], ' - ',
                             str(mile['due_on']), '}'])
+
+                if str(self.issues_dict[n]['state']) == 'closed':
+                    ip = '{0} x {1}'.format(ip,
+                            str(self.issues_dict[n]['closed_at'])[:10])
                 self.formatted.append(format_str.format(num=n, title=title, author=author,
-                    extra=labels, id=id))
+                    extra=labels, ip=ip))
+
+
+    def get_flat_data(self):
+        """Return the original string."""
+        return self.flat_data
+
+
+    def get_formatted_items(self):
+        """Return the formatted issues."""
+        if not self.formatted:
+            self.format_issues()
+        return self.formatted
+
+
+    def get_issue(self, number):
+        """Return the dictionary for the specified issue."""
+        return self.issues_dict[number]
+
+
+    def parse(self, data):
+        """Takes either strings or GitHub() objects."""
+        if isinstance(data, str):
+            self.__parse__(data)
+        elif isinstance(data, GitHub):
+            self.__parse__(data.get_data())
 
 
     def print_issues(self):
         """Print the issues."""
-        self.format_issues()
+        if not self.formatted:
+            self.format_issues()
         for issue in self.formatted:
             print(issue)
 
@@ -201,23 +222,16 @@ class Issues(object):
             self.github.add_oauth(oauth_token)
 
 
-    def cache(self, cache_dir='.'):
-        if self.cached:
-            return
-        if self.owner and self.project:
-            filename = '{0}/{1}-{2}.json'.format(cache_dir, self.owner, self.project)
-        elif self.user:
-            filename = '{0}/{1}.json'.format(cache_dir, self.user)
-        with open(filename, 'w+') as fd:
-            fd.write(self.issues.get_flat_data())
-
-
     def __search_for__(self, owner, project, cache_dir):
         from os import listdir, stat
         from time import time
         name = '{0}-{1}.json'.format(owner, project)
+        if self.params:
+            sanitized = self.params.replace('=', '').replace('&', '')
+            name = '-'.format([name, self.params])
         for f in listdir(cache_dir):
             if f == name:
+                print("FOUND IT\n\n")
                 s = stat(f)
                 s = int(time() - s.st_ctime)/60
                 if s < 60:
@@ -226,8 +240,29 @@ class Issues(object):
         return None
 
 
+    def cache(self, cache_dir='.'):
+        if self.cached:
+            return
+
+        if self.owner and self.project:
+            filename = '{0}/{1}-{2}.json'.format(cache_dir, self.owner, self.project)
+        elif self.user:
+            filename = '{0}/{1}.json'.format(cache_dir, self.user)
+
+        if self.params:
+            filename = '-'.join([filename, self.params])
+        with open(filename, 'w+') as fd:
+            fd.write(self.issues.get_flat_data())
+
+
     def fetch_issues(self, owner=None, project=None, check_cache=False,
-            cache_dir=None):
+            cache_dir=None, **kwargs):
+        """Fetches the issues to later be formatted."""
+        self.params = None
+        if kwargs:
+            self.params = ['{0}={1}'.format(k, v) for (k, v) in kwargs.items()]
+            self.params = '&'.join(self.params)
+
         if check_cache:
             owner = owner or self.owner
             project = project or self.project
@@ -241,6 +276,9 @@ class Issues(object):
             url = 'https://api.github.com/repos/{owner}/{proj}/issues'
             url = url.format(owner=owner, proj=project)
 
+        if self.params:
+            url = '?'.join([self.github.get_url(), self.params])
+
         self.github.request(url)
         if self.github.get_code() == 200:
             self.issues.parse(self.github)
@@ -249,10 +287,42 @@ class Issues(object):
                 self.github.get_url()))
 
 
-    def print_issues(self):
-        self.issues.print_issues()
-
-
     def open_cache(self, filename):
+        if self.params:
+            filename = '-'.join([filename, self.params])
         with open(filename, 'r') as fd:
             self.issues.parse(fd.read())
+
+
+    def print_issue(self, number):
+        if number <= 0:
+            return
+        l = self.issues.get_formatted_items()
+        issue = self.issues.get_issue(number)
+        for i in l:
+            n = i.index(str(number))
+            if n > 0 and n < i.index('|'):
+                l = i.strip()
+                break
+        info = ' {0} - {1} comment(s) - {2}'.format(
+                issue['html_url'], issue['comments'], issue['created_at'][:10])
+        old_body = issue['body'].split('\r\n')
+        new_body = []
+        for line in old_body:
+            if len(line) <= 80:
+                new_body.append(line)
+                continue
+            while len(line) > 80:
+                i = line[:80].rfind(' ')
+                new_body.append(line[:i])
+                i += 1
+                line = line[i:]
+            new_body.append(line)
+        print(l)
+        print(info)
+        print('')
+        print('\n'.join(new_body))
+        
+
+    def print_issues(self):
+        self.issues.print_issues()

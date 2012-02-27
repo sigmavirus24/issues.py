@@ -18,8 +18,8 @@
 #
 # TLDR: This is licensed under the GPLv3. See LICENSE for more details.
 
-from sys import version_info
-if version_info >= (3, 0):
+import sys
+if sys.version_info >= (3, 0):
     from urllib.request import Request, urlopen
     from urllib.error import HTTPError
 else:

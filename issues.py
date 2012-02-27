@@ -119,7 +119,9 @@ class IssuesParser(object):
 
     def __parse__(self, data):
         """Parse the data which must be a string at this point."""
-        self.flat_data = data.decode()
+        self.flat_data = data
+        if isinstance(data, bytes):
+            self.flat_data = data.decode()
         self.structured_data = json.loads(self.flat_data)
         for d in self.structured_data:
             self.issues_dict[d['number']] = d
@@ -228,7 +230,6 @@ class Issues(object):
         name = '{0}-{1}.json'.format(owner, project)
         for f in listdir(cache_dir):
             if f == name:
-                print("FOUND IT\n\n")
                 s = stat(f)
                 s = int(time() - s.st_ctime)/60
                 if s < 60:
@@ -299,22 +300,18 @@ class Issues(object):
                 break
         info = ' {0} - {1} comment(s) - {2}'.format(
                 issue['html_url'], issue['comments'], issue['created_at'][:10])
-        old_body = issue['body'].split('\r\n')
-        new_body = []
-        for line in old_body:
-            if len(line) <= 80:
-                new_body.append(line)
-                continue
-            while len(line) > 80:
-                i = line[:80].rfind(' ')
-                new_body.append(line[:i])
-                i += 1
-                line = line[i:]
-            new_body.append(line)
+        body = issue['body'].split('\r\n')
         print(l)
         print(info)
-        print('')
-        print('\n'.join(new_body))
+        for line in body:
+            while len(line) > 80:
+                i = line[:80].rfind(' ')
+                if i <= 0:
+                    i = 79
+                print(line[:i])
+                i += 1
+                line = line[i:]
+            print(line)
         
 
     def print_issues(self):

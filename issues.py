@@ -226,9 +226,6 @@ class Issues(object):
         from os import listdir, stat
         from time import time
         name = '{0}-{1}.json'.format(owner, project)
-        if self.params:
-            sanitized = self.params.replace('=', '').replace('&', '')
-            name = '-'.format([name, self.params])
         for f in listdir(cache_dir):
             if f == name:
                 print("FOUND IT\n\n")
@@ -241,7 +238,7 @@ class Issues(object):
 
 
     def cache(self, cache_dir='.'):
-        if self.cached:
+        if self.cached or self.params:
             return
 
         if self.owner and self.project:
@@ -249,8 +246,6 @@ class Issues(object):
         elif self.user:
             filename = '{0}/{1}.json'.format(cache_dir, self.user)
 
-        if self.params:
-            filename = '-'.join([filename, self.params])
         with open(filename, 'w+') as fd:
             fd.write(self.issues.get_flat_data())
 
@@ -288,8 +283,6 @@ class Issues(object):
 
 
     def open_cache(self, filename):
-        if self.params:
-            filename = '-'.join([filename, self.params])
         with open(filename, 'r') as fd:
             self.issues.parse(fd.read())
 
@@ -300,7 +293,7 @@ class Issues(object):
         l = self.issues.get_formatted_items()
         issue = self.issues.get_issue(number)
         for i in l:
-            n = i.index(str(number))
+            n = i.find(str(number))
             if n > 0 and n < i.index('|'):
                 l = i.strip()
                 break

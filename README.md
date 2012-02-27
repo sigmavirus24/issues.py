@@ -1,4 +1,6 @@
-# GitHub Issues Python Mananger
+# issues.py
+
+## GitHub Issues Python Mananger
 
 In the vein of [todo.py](http://git.io/todo.py)
 
@@ -6,7 +8,7 @@ The project is meant to be a standalone script like
 [todo.py](http://git.io/todo.py) but can be used as a module presently and
 in the future as well probably. It works on Python 2.6-3.x.
 
-# Dependencies
+## Dependencies
 
 None.
 
@@ -15,7 +17,15 @@ I could have used Kenneth Reitz's great
 wanted to have as few dependencies as possible. If someone else wants to do
 this using his module, they fork this and integrate that.
 
-# Module Example 
+## Goals
+
+ * Fully-tested partial library (Will only cover the issues part of GitHub)
+ * Fully-featured issue tracking script
+ * Will have complete caching for parameterized requests and non-paramerterized
+   requests
+ * Python 2.6 thru 3.2 (and maybe even 3.3) compatibility
+
+## Module Example 
 
 ```python
 from issues import Issues
@@ -82,4 +92,26 @@ sigma@virus:~/sandbox/issues.py$ example_script.py
  39|i Windows colored text is not working (AltReality) 
  42|p Initialise colorama for textui on Windows. (takluyver) 
  44|p Fixed a typo in README.rst (mjs2600) 
+```
+
+**example_script2.py**
+
+```python
+#!/usr/bin/env python
+
+from issues import Issues
+
+if __name__ == "__main__":
+    i = Issues(owner='sigmavirus24', project='Todo.txt-python')
+    i.fetch_issues(state='closed')
+    i.print_issue(4)
+```
+
+```sh
+sigma@virus:~/sandbox/issues.py$ example_script2.py
+4|p x 2011-12-02 Tweaks to padding logic (jvstein)
+ https://github.com/sigmavirus24/Todo.txt-python/issues/4 - 1 comment(s) - 2011-12-01
+
+Finally got my list down to exactly 10 items and noticed this little oversight.
+The same commit is also on my copy of the gitless branch.
 ```

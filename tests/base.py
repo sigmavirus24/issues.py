@@ -29,17 +29,25 @@ class BaseCase(unittest.TestCase):
             ['clint', 'requests', 'httpbin'], 'osteele10': ['jetsam'], 'fabric':
             ['fabric'], 'rupa': ['sprunge'], 'tpope': ['vim-pathogen']}  # More to be added
     cache_files = []
+    api_base = 'https://api.github.com/'
 
     def setUp(self):
-        self.backupstdout, sys.stdout = sys.stdout, os.devnull
-        self.issues = Issues()
+        self.backupstdout, sys.stdout = sys.stdout, open(os.devnull, 'w')
+        self.issues = issues.Issues()
+
 
     def tearDown(self):
         self.stdout = self.backupstdout
 
+
     def add_to_cache(self, filename):
         self.cache_files.append(filename)
+
 
     def assert_cache_was_written(self, filename):
         for node in os.listdir(self.issues.get_cache_dir()):
             self.assertEquals(node, filename)
+    
+
+    def ghurl(self, string):
+        return ''.join([self.api_base, string])

@@ -34,9 +34,9 @@ class GitHub(object):
         self.req = None
         self.auth = None
         self.last_url = None
-        self.headers = None
         self.code = None
         self.data = None
+        self.response = None
         if user and pw:
             self.add_basic_auth(user, pw)
         elif oauth_token:
@@ -44,17 +44,14 @@ class GitHub(object):
 
 
     def __request__(self):
-        response = None
         self.req = Request(self.last_url)
         if self.auth:
             self.req.add_header('Authorization', self.auth)
         try:
-            response = urlopen(self.req)
+            self.response = urlopen(self.req)
         except HTTPError as error:
-            response = error
-        self.headers = response.headers
-        self.code = response.getcode()
-        self.data = response.read()
+            self.response = error
+        self.data = self.response.read()
 
 
     def add_basic_auth(self, user, pw):
@@ -66,32 +63,38 @@ class GitHub(object):
         """Adds oauth authentication to the object."""
         self.auth = ' '.join(['token', oauth_token])
 
-    
-    def get_code(self):
-        """Return the HTTP code for the last request."""
-        return self.code
+
+    def getcode(self):
+        """Return the code from the last request."""
+        return self.response.getcode()
 
 
-    def get_data(self):
+    def getdata(self):
         """Return the stored data received from the last request."""
         return self.data
 
 
-    def get_headers(self):
-        """Return the stored headers object."""
-        return self.headers
+    def getheaders(self):
+        """Return the headers from the last request."""
+        return self.response.headers
 
 
-    def get_url(self):
-        """Return the stored url used by the last request."""
+    def geturl(self):
+        """Return the url from the last request."""
         return self.last_url
+
+
+    def get_header(self, header):
+        """Return the stored headers object."""
+        if header in self.response.headers:
+            return self.response.headers[header]
 
 
     def request(self, url=None):
         """Send a GET request to the GitHub API."""
-        if url and url.startswith('https://api.github.com/'):
-            self.last_url = url
-        elif not (self.last_url or url):
+        self.last_url = url or self.last_url
+        if not (self.last_url 
+                or self.last_url.startswith('https://api.github.com/')):
             print('All requests must be made to "https://api.github.com/"')
             return
         self.__request__()
@@ -189,7 +192,7 @@ class IssuesParser(object):
         if isinstance(data, str):
             self.__parse__(data)
         elif isinstance(data, GitHub):
-            self.__parse__(data.get_data())
+            self.__parse__(data.getdata())
 
 
     def print_issues(self):
@@ -209,6 +212,9 @@ class Issues(object):
         self.issues = IssuesParser()
         self.owner = None
         self.project = None
+        self.user = None
+        self.pw = None
+        self.oauth_token = None
         self.url = None
         self.my_issues = None
         self.cached = False
@@ -238,7 +244,7 @@ class Issues(object):
 
     def __set_default_url__(self):
         b = (self.user and self.pw) or self.oauth_token
-        if not self.github.get_url() and b:
+        if not self.github.geturl() and b:
             self.github.set_url(self.my_issues)
 
 
@@ -254,6 +260,7 @@ class Issues(object):
         self.user = user
         self.my_issues = 'https://api.github.com/issues'
         if pw:
+            self.pw = pw
             self.github.add_basic_auth(user, pw)
 
 
@@ -292,14 +299,14 @@ class Issues(object):
             url = url.format(owner=owner, proj=project)
 
         if self.params:
-            url = '?'.join([self.github.get_url(), self.params])
+            url = '?'.join([self.github.geturl(), self.params])
 
         self.github.request(url)
-        if self.github.get_code() == 200:
+        if self.github.getcode() == 200:
             self.issues.parse(self.github)
         else:
-            print("{0} error: {1}.".format(self.github.get_code(),
-                self.github.get_url()))
+            print("{0} error: {1}.".format(self.github.getcode(),
+                self.github.geturl()))
 
 
     def open_cache(self, filename):

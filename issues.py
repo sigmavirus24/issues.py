@@ -105,6 +105,11 @@ class GitHub(object):
         self.last_url = url
 
 
+    def using_auth(self):
+        """Returns True if some authentication was provided."""
+        return True if self.auth else False
+
+
 class IssuesParser(object):
     """Handles the parsing of issues"""
 
@@ -213,9 +218,6 @@ class Issues(object):
         self.owner = None
         self.project = None
         self.user = None
-        self.pw = None
-        self.oauth_token = None
-        self.url = None
         self.my_issues = None
         self.cached = False
 
@@ -243,17 +245,16 @@ class Issues(object):
 
 
     def __set_default_url__(self):
-        b = (self.user and self.pw) or self.oauth_token
-        if not self.github.geturl() and b:
+        if not self.github.geturl() and self.github.using_auth():
             self.github.set_url(self.my_issues)
 
 
     def add_project(self, owner, project):
         self.owner = owner
         self.project = project
-        self.url = 'https://api.github.com/repos/{owner}/{proj}/issues'
-        self.url = self.url.format(owner=self.owner, proj=self.project)
-        self.github.set_url(self.url)
+        url = 'https://api.github.com/repos/{owner}/{proj}/issues'
+        url = url.format(owner=self.owner, proj=self.project)
+        self.github.set_url(url)
 
 
     def add_myself(self, user, pw):

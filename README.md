@@ -20,6 +20,7 @@ this using his module, they fork this and integrate that.
 ## Goals
 
  * Fully-tested partial library (Will only cover the issues part of GitHub)
+    * Although, I reserve the right to spin off part of it into it's own GitHub API library
  * Fully-featured issue tracking script
  * Will have complete caching for parameterized requests and non-paramerterized
    requests
@@ -65,6 +66,8 @@ from issues import Issues
 if __name__ == "__main__":
     i = Issues(owner='kennethreitz', project='clint')
     i.fetch_issues(check_cache=True, cache_dir='.')
+    # If you add: i.fetch_issues(state='closed'), it will print all the issues
+    # ever for the project
     i.print_issues()
     i.cache('.')
 ```

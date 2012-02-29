@@ -56,7 +56,8 @@ class GitHub(object):
 
     def add_basic_auth(self, user, pw):
         """Adds basic authentication to the object."""
-        self.auth = ' '.join(['Basic', b64encode(':'.join([user, pw]))])
+        joined = b64encode(':'.join([user, pw]).encode()).decode()
+        self.auth = ' '.join(['Basic', joined])
 
 
     def add_oauth(self, oauth_token):
@@ -94,8 +95,9 @@ class GitHub(object):
         """Send a GET request to the GitHub API."""
         self.last_url = url or self.last_url
         if not (self.last_url 
-                or self.last_url.startswith('https://api.github.com/')):
+                and self.last_url.startswith('https://api.github.com/')):
             print('All requests must be made to "https://api.github.com/"')
+            self.last_url = None
             return
         self.__request__()
 

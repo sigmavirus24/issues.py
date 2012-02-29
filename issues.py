@@ -214,20 +214,12 @@ class Issues(object):
         self.cached = False
 
         if owner and project:
-            self.owner = owner
-            self.project = project
-            self.url = 'https://api.github.com/repos/{owner}/{proj}/issues'
-            self.url = self.url.format(owner=self.owner, proj=self.project)
-            self.github.set_url(self.url)
-        if user:
-            self.user = user
-            self.my_issues = 'https://api.github.com/issues'
-            if pw:
-                self.github.add_basic_auth(user, pw)
-            if not self.github.get_url():
-                self.github.set_url(self.my_issues)
+            self.add_project(owner, project)
+        if user and pw:
+            self.add_myself(user, pw)
         if oauth_token:
             self.github.add_oauth(oauth_token)
+        self.__set_default_url__()
 
 
     def __search_for__(self, owner, project, cache_dir):
@@ -242,6 +234,27 @@ class Issues(object):
                     self.cached = True
                     return f
         return None
+
+
+    def __set_default_url__(self):
+        b = (self.user and self.pw) or self.oauth_token
+        if not self.github.get_url() and b:
+            self.github.set_url(self.my_issues)
+
+
+    def add_project(self, owner, project):
+        self.owner = owner
+        self.project = project
+        self.url = 'https://api.github.com/repos/{owner}/{proj}/issues'
+        self.url = self.url.format(owner=self.owner, proj=self.project)
+        self.github.set_url(self.url)
+
+
+    def add_myself(self, user, pw):
+        self.user = user
+        self.my_issues = 'https://api.github.com/issues'
+        if pw:
+            self.github.add_basic_auth(user, pw)
 
 
     def cache(self, cache_dir='.'):

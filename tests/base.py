@@ -25,9 +25,21 @@ import unittest
 import issues
 
 class BaseCase(unittest.TestCase):
-    repositories = ['sigmavirus24/Todo.txt-python', 'kennethreitz/clint',
-            'osteele10/jetsam']  # More to be added
+    repositories = {'sigmavirus24': ['Todo.txt-python'], 'kennethreitz':
+            ['clint', 'requests', 'httpbin'], 'osteele10': ['jetsam'], 'fabric':
+            ['fabric'], 'rupa': ['sprunge'], 'tpope': ['vim-pathogen']}  # More to be added
+    cache_files = []
 
-    def set_up(self):
-        self.backup, sys.stdout = sys.stdout, os.devnull
+    def setUp(self):
+        self.backupstdout, sys.stdout = sys.stdout, os.devnull
         self.issues = Issues()
+
+    def tearDown(self):
+        self.stdout = self.backupstdout
+
+    def add_to_cache(self, filename):
+        self.cache_files.append(filename)
+
+    def assert_cache_was_written(self, filename):
+        for node in os.listdir(self.issues.get_cache_dir()):
+            self.assertEquals(node, filename)

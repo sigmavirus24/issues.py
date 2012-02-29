@@ -2,6 +2,9 @@
 
 ## GitHub Issues Python Mananger
 
+[![Build
+Status](https://secure.travis-ci.org/sigmavirus24/issues.py.png?branch=master)](http://travis-ci.org/sigmavirus24/issues.py)
+
 In the vein of [todo.py](http://git.io/todo.py)
 
 The project is meant to be a standalone script like

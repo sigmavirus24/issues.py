@@ -131,7 +131,13 @@ class IssuesParser(object):
 
     def format_issues(self):
         """Format the issues that were just parsed and place them in a list."""
-        format_str = '{num:>3}|{ip} {title} ({author}) {extra}'
+        format_str = '|{ip} {title} ({author}) {extra}'
+        m = self.issue_numbers[-1]
+        pad = 1
+        while m >= 10:
+            pad += 1
+            m /= 10
+        format_str = ''.join(['{num:>', str(pad), '}', format_str])
         if self.issues_dict and self.issue_numbers:
             for n in self.issue_numbers:
                 title = self.issues_dict[n]['title']

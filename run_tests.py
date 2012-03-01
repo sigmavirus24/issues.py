@@ -39,4 +39,5 @@ if __name__ == "__main__":
         names = [ "".join(["tests.", a]) for a in tmp ]
         suite = unittest.defaultTestLoader.loadTestsFromNames(names)
 
+    print("=== START TEST SUITE ===")
     unittest.TextTestRunner(verbosity=2).run(suite)

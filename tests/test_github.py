@@ -30,11 +30,13 @@ class GitHub_Test(base.BaseCase):
         self.assertEquals(github.geturl(), None)
 
 
-    def __test_code__(self, url, code):
+    def __test_code__(self, url, code, data=None):
         url = self.ghurl(url)
         github = GitHub()
         github.request(url)
         self.assertEquals(github.getcode(), code)
+        if data:
+            self.assertEquals(github.getdata(), data)
 
 
     def test_invalid_userpassword(self):
@@ -42,10 +44,12 @@ class GitHub_Test(base.BaseCase):
         github = GitHub('test', 'password')
         github.request(url)
         self.assertEquals(github.getcode(), 401)
+        self.assertEquals(github.getdata(), '{"message":"Bad credentials"}')
 
 
     def test_invalid_repository(self):
-        self.__test_code__('repos/sigmavirus24/fakerepo', 404)
+        self.__test_code__('repos/sigmavirus24/fakerepo', 404, 
+            '{"message":"Not Found"}')
 
 
     def test_invalid_user(self):

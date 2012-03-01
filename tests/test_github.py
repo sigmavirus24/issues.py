@@ -35,8 +35,9 @@ class GitHub_Test(base.BaseCase):
         github = GitHub()
         github.request(url)
         self.assertEquals(github.getcode(), code)
+        self.assertEquals(github.geturl(), url)
         if data:
-            self.assertEquals(github.getdata(), data)
+            self.assert_bytes_equals(github.getdata(), data)
 
 
     def test_invalid_userpassword(self):
@@ -44,7 +45,7 @@ class GitHub_Test(base.BaseCase):
         github = GitHub('test', 'password')
         github.request(url)
         self.assertEquals(github.getcode(), 401)
-        self.assertEquals(github.getdata(), '{"message":"Bad credentials"}')
+        self.assert_bytes_equals(github.getdata(), '{"message":"Bad credentials"}')
 
 
     def test_invalid_repository(self):

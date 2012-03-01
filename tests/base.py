@@ -49,5 +49,13 @@ class BaseCase(unittest.TestCase):
             self.assertEquals(node, filename)
     
 
+    def assert_bytes_equals(self, a, b):
+        if not isinstance(a, bytes):
+            a = a.encode()
+        if not isinstance(b, bytes):
+            b = b.encode()
+        self.assertEquals(a, b)
+
+
     def ghurl(self, string):
         return ''.join([self.api_base, string])

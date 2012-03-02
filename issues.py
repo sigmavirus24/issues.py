@@ -27,6 +27,7 @@ else:
 import json
 from base64 import b64encode
 
+
 class GitHub(object):
     """Basic API Interface."""
 
@@ -42,7 +43,6 @@ class GitHub(object):
         elif oauth_token:
             self.add_oauth(oauth_token)
 
-
     def __request__(self):
         self.req = Request(self.last_url)
         if self.auth:
@@ -53,59 +53,49 @@ class GitHub(object):
             self.response = error
         self.data = self.response.read()
 
-
     def add_basic_auth(self, user, pw):
         """Adds basic authentication to the object."""
         joined = b64encode(':'.join([user, pw]).encode()).decode()
         self.auth = ' '.join(['Basic', joined])
 
-
     def add_oauth(self, oauth_token):
         """Adds oauth authentication to the object."""
         self.auth = ' '.join(['token', oauth_token])
-
 
     def getcode(self):
         """Return the code from the last request."""
         return self.response.getcode()
 
-
     def getdata(self):
         """Return the stored data received from the last request."""
         return self.data
-
 
     def getheaders(self):
         """Return the headers from the last request."""
         return self.response.headers
 
-
     def geturl(self):
         """Return the url from the last request."""
         return self.last_url
-
 
     def get_header(self, header):
         """Return the stored headers object."""
         if header in self.response.headers:
             return self.response.headers[header]
 
-
     def request(self, url=None):
         """Send a GET request to the GitHub API."""
         self.last_url = url or self.last_url
-        if not (self.last_url 
+        if not (self.last_url
                 and self.last_url.startswith('https://api.github.com/')):
             print('All requests must be made to "https://api.github.com/"')
             self.last_url = None
             return
         self.__request__()
 
-
     def set_url(self, url):
         """Set url to use for requests."""
         self.last_url = url
-
 
     def using_auth(self):
         """Returns True if some authentication was provided."""
@@ -118,14 +108,14 @@ class IssuesParser(object):
     def __init__(self, data=None):
         """Return an initialized IssuesParser object."""
         self.flat_data = None  # The string returned by the call to the API
-        self.structured_data = None  # The data structure returned by json.loads()
+        self.structured_data = None
+        # The data structure returned by json.loads()
         self.issues_dict = {}  # Dictionary to keep the issues in
         self.issue_numbers = []  # Sorted list of issue numbers
         self.formatted = []
 
         if data:
             self.parse(data)
-
 
     def __parse__(self, data):
         """Parse the data which must be a string at this point."""
@@ -137,7 +127,6 @@ class IssuesParser(object):
             self.issues_dict[d['number']] = d
             self.issue_numbers.append(d['number'])
             self.issue_numbers.sort()
-
 
     def format_issues(self):
         """Format the issues that were just parsed and place them in a list."""
@@ -160,7 +149,7 @@ class IssuesParser(object):
 
                 if self.issues_dict[n]['assignee']:
                     assignee = self.issues_dict[n]['assignee']['login']
-                labels = '@{0} '.format(assignee) if assignee else '' 
+                labels = '@{0} '.format(assignee) if assignee else ''
                 for l in self.issues_dict[n]['labels']:
                     l['name'] = l['name'].replace(' ', '_')
                     labels = ''.join([labels, '+', l['name'], ' '])
@@ -173,14 +162,12 @@ class IssuesParser(object):
                 if str(self.issues_dict[n]['state']) == 'closed':
                     ip = '{0} x {1}'.format(ip,
                             str(self.issues_dict[n]['closed_at'])[:10])
-                self.formatted.append(format_str.format(num=n, title=title, author=author,
-                    extra=labels, ip=ip))
-
+                self.formatted.append(format_str.format(num=n, title=title,
+                    author=author, extra=labels, ip=ip))
 
     def get_flat_data(self):
         """Return the original string."""
         return self.flat_data
-
 
     def get_formatted_items(self):
         """Return the formatted issues."""
@@ -188,11 +175,9 @@ class IssuesParser(object):
             self.format_issues()
         return self.formatted
 
-
     def get_issue(self, number):
         """Return the dictionary for the specified issue."""
         return self.issues_dict[number]
-
 
     def parse(self, data):
         """Takes either strings or GitHub() objects."""
@@ -200,7 +185,6 @@ class IssuesParser(object):
             self.__parse__(data)
         elif isinstance(data, GitHub):
             self.__parse__(data.getdata())
-
 
     def print_issues(self):
         """Print the issues."""
@@ -231,7 +215,6 @@ class Issues(object):
             self.github.add_oauth(oauth_token)
         self.__set_default_url__()
 
-
     def __search_for__(self, owner, project, cache_dir):
         from os import listdir, stat
         from time import time
@@ -239,17 +222,15 @@ class Issues(object):
         for f in listdir(cache_dir):
             if f == name:
                 s = stat(f)
-                s = int(time() - s.st_ctime)/60
+                s = int(time() - s.st_ctime) / 60
                 if s < 60:
                     self.cached = True
                     return f
         return None
 
-
     def __set_default_url__(self):
         if not self.github.geturl() and self.github.using_auth():
             self.github.set_url(self.my_issues)
-
 
     def add_project(self, owner, project):
         self.owner = owner
@@ -258,7 +239,6 @@ class Issues(object):
         url = url.format(owner=self.owner, proj=self.project)
         self.github.set_url(url)
 
-
     def add_myself(self, user, pw):
         self.user = user
         self.my_issues = 'https://api.github.com/issues'
@@ -266,19 +246,18 @@ class Issues(object):
             self.pw = pw
             self.github.add_basic_auth(user, pw)
 
-
     def cache(self, cache_dir='.'):
         if self.cached or self.params:
             return
 
         if self.owner and self.project:
-            filename = '{0}/{1}-{2}.json'.format(cache_dir, self.owner, self.project)
+            filename = '{0}/{1}-{2}.json'.format(cache_dir, self.owner,
+                    self.project)
         elif self.user:
             filename = '{0}/{1}.json'.format(cache_dir, self.user)
 
         with open(filename, 'w+') as fd:
             fd.write(self.issues.get_flat_data())
-
 
     def fetch_issues(self, owner=None, project=None, check_cache=False,
             cache_dir=None, **kwargs):
@@ -311,11 +290,9 @@ class Issues(object):
             print("{0} error: {1}.".format(self.github.getcode(),
                 self.github.geturl()))
 
-
     def open_cache(self, filename):
         with open(filename, 'r') as fd:
             self.issues.parse(fd.read())
-
 
     def print_issue(self, number):
         if number <= 0:
@@ -341,7 +318,6 @@ class Issues(object):
                 i += 1
                 line = line[i:]
             print(line)
-        
 
     def print_issues(self):
         self.issues.print_issues()

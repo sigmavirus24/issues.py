@@ -70,3 +70,22 @@ class GitHub_Test(base.BaseCase):
         github = GitHub()
         github.set_url(url)
         self.assertEquals(github.geturl(), url)
+
+    def test_auth(self):
+        auth = ('sigmavirus24', 'fakepassword')
+        oauth = 'oauth_token_clearly_not_real'
+        # Basic Authentication at initialization
+        github = GitHub(*auth)
+        self.assertTrue(github.using_auth())
+        # Basic Authorization after initialization
+        github = GitHub()
+        self.assertFalse(github.using_auth())
+        github.add_basic_auth(*auth)
+        self.assertTrue(github.using_auth())
+        # OAuth Authorization at initialization
+        github = GitHub(oauth_token=oauth)
+        self.assertTrue(github.using_auth())
+        # OAuth Authorization after initialization
+        github = GitHub()
+        github.add_oauth(oauth)
+        self.assertTrue(github.using_auth())

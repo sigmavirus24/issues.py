@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 
-# base.py -- base class for unittests designed for issues.py
+# test_github.py -- unittests for the GitHub class in issues.py
 # Copyright (C) 2012  Sigmavirus24
 #
 # This program is free software: you can redistribute it and/or modify
@@ -54,7 +54,7 @@ class GitHub_Test(base.BaseCase):
 
 
     def test_invalid_user(self):
-        self.__test_code__('users/nevereverever', 404)
+        self.__test_code__('users/nevereverever', 404, '{"message":"Not Found"}')
 
 
     def test_valid_repository(self):
@@ -63,3 +63,10 @@ class GitHub_Test(base.BaseCase):
 
     def test_valid_user(self):
         self.__test_code__('users/sigmavirus24', 200)
+
+
+    def test_set_url(self):
+        url = self.ghurl('repos/sigmavirus24')
+        github = GitHub()
+        github.set_url(url)
+        self.assertEquals(github.geturl(), url)

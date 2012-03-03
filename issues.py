@@ -121,7 +121,7 @@ class IssuesParser(object):
         """Parse the data which must be a string at this point."""
         self.flat_data = data
         if isinstance(data, bytes):
-            self.flat_data = data.decode()
+            self.flat_data = data.decode('utf-8')
         self.structured_data = json.loads(self.flat_data)
         for d in self.structured_data:
             self.issues_dict[d['number']] = d
@@ -200,7 +200,7 @@ class Issues(object):
     def __init__(self, owner=None, project=None, user=None, pw=None,
             oauth_token=None):
         self.github = GitHub()
-        self.issues = IssuesParser()
+        self.parser = IssuesParser()
         self.owner = None
         self.project = None
         self.user = None
@@ -216,6 +216,7 @@ class Issues(object):
         self.__set_default_url__()
 
     def __search_for__(self, owner, project, cache_dir):
+        """Searches for the cached data."""
         from os import listdir, stat
         from time import time
         name = '{0}-{1}.json'.format(owner, project)
@@ -229,6 +230,8 @@ class Issues(object):
         return None
 
     def __set_default_url__(self):
+        """Make sure the URL is set by first checking if it's set and then 
+        using the user URL."""
         if not self.github.geturl() and self.github.using_auth():
             self.github.set_url(self.my_issues)
 
@@ -257,7 +260,7 @@ class Issues(object):
             filename = '{0}/{1}.json'.format(cache_dir, self.user)
 
         with open(filename, 'w+') as fd:
-            fd.write(self.issues.get_flat_data())
+            fd.write(self.parser.get_flat_data())
 
     def fetch_issues(self, owner=None, project=None, check_cache=False,
             cache_dir=None, **kwargs):
@@ -285,20 +288,20 @@ class Issues(object):
 
         self.github.request(url)
         if self.github.getcode() == 200:
-            self.issues.parse(self.github)
+            self.parser.parse(self.github)
         else:
             print("{0} error: {1}.".format(self.github.getcode(),
                 self.github.geturl()))
 
     def open_cache(self, filename):
         with open(filename, 'r') as fd:
-            self.issues.parse(fd.read())
+            self.parser.parse(fd.read())
 
     def print_issue(self, number):
         if number <= 0:
             return
-        l = self.issues.get_formatted_items()
-        issue = self.issues.get_issue(number)
+        l = self.parser.get_formatted_items()
+        issue = self.parser.get_issue(number)
         for i in l:
             n = i.find(str(number))
             if n > 0 and n < i.index('|'):
@@ -320,4 +323,7 @@ class Issues(object):
             print(line)
 
     def print_issues(self):
-        self.issues.print_issues()
+        self.parser.print_issues()
+
+
+# vim:set et;set tw=80

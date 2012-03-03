@@ -177,6 +177,7 @@ class IssuesParser(object):
 
     def get_issue(self, number):
         """Return the dictionary for the specified issue."""
+        number = int(number)
         return self.issues_dict[number]
 
     def parse(self, data):

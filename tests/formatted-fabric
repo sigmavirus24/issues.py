@@ -1,0 +1,30 @@
+515|i Improve documentation on Failure handling (jaraco) +1.x +Docs +Quick +Support 
+516|p Add possibility to define FABRICRC environment variable (kryskool) +Feature +1.x +Core 
+518|i Nested roles (sjmh) +1.x +Feature +Core 
+520|i Consider merging contrib.rsync_* into put/get (bitprophet) +1.x +Contrib +Support 
+524|p Fixes #518. Modifies AliasDict to allow for nested roles. (sjmh) +Feature +1.x +Core 
+525|i Support for OS specific keychain for passwords (cnf) +1.x +Feature +Core 
+531|i Rethink env re: configuration & shared datastruct (bitprophet) +2.x 
+533|i Option for skipping auth failures in addition to connection ones (bitprophet) +1.x +Core +Feature 
+535|p Noddy implementation of a --dry-run-remote option (mcmarkb) +Feature +1.x +Core 
+537|i Support recursive wildcards using glob2 (miracle2k) +2.x +Feature +put()/get() 
+539|p Small update to docs, Issue #540 (Add dotted python path support) (dcolish) 
+540|i Allow fabric to use dotted python paths (dcolish) +Feature +1.x +Core +Tasks +Invoke 
+541|i Allow fabric to be service-centric (ZZelle) 
+544|p SFtp.put(): Preserve access and modification times (vitek) +Feature +Operations +1.x 
+545|p Adds convenience chown-ing kwargs to put and upload_template. (ehebert) 
+546|i Custom sphinx directive for env vars (bitprophet) +1.x +Docs +Support 
+552|p make fabric capable of loading .fabricrc.[yml|yaml] files (twoolie) 
+556|i Allow runtime selection of per-task parallelization (bitprophet) +1.x +Core +Feature +Network 
+557|i Specify namespace on command line (mjtamlyn) +Feature +Core +1.x +Invoke 
+558|p Switching output to logging module (tswicegood) 
+562|i SSH agent forwarding error (jravetch) +Bug +1.x +Network 
+563|i Host aliases (bitprophet) +Core +Feature +2.x 
+564|i Document env.sudo_prefix (bitprophet) +1.x +Quick +Docs +Support 
+565|i Split out non-ssh-dependent features into separate lib (bitprophet) +2.x +Packaging +Refactoring +Support +Wart 
+566|i Fabfile in /etc (vxnick) +Feature +1.x +Core +Quick 
+567|p Bug when scaping quotes in sed (mviera) 
+568|i execute() on different host does not change back to original host when done (jsdalton) +1.x +Wart +Bug +Core #{1.3.6 - None}
+569|i @task decorator causes Sphinx autodoc to lose fuction signature (MattAustin) +Core +1.x +Bug 
+571|i Extremelly slow get(...) call (JensRantil) +Bug +1.x +Network +put()/get() 
+573|i Class-based task sets (kmike) +2.x +Invoke +Feature 

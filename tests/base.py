@@ -35,19 +35,19 @@ class Base(unittest.TestCase):
         self.backupstdout, sys.stdout = sys.stdout, open(os.devnull, 'w')
         self.issues = issues.Issues()
 
-
     def tearDown(self):
         self.stdout = self.backupstdout
-
 
     def add_to_cache(self, filename):
         self.cache_files.append(filename)
 
+    def assert_list_items_equivalent(self, a, b):
+        for i in a:
+            self.assertEquals(i, b.pop(0))
 
     def assert_cache_was_written(self, filename):
         for node in os.listdir(self.issues.get_cache_dir()):
             self.assertEquals(node, filename)
-    
 
     def assert_bytes_equals(self, a, b):
         if not isinstance(a, bytes):
@@ -55,7 +55,6 @@ class Base(unittest.TestCase):
         if not isinstance(b, bytes):
             b = b.encode()
         self.assertEquals(a, b)
-
 
     def ghurl(self, string):
         return ''.join([self.api_base, string])

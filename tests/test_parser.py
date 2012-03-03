@@ -19,14 +19,55 @@
 # TLDR: This is licensed under the GPLv3. See LICENSE for more details.
 
 import base
-from issues import IssuesParser
+import json
+from issues import IssuesParser, GitHub
 
 class IssuesParser_Test(base.Base):
     def setUp(self):
-        self.clint_data = open('tests/json-clint', 'r').read()
-        self.todo_data = open('tests/json-todo.py', 'r').read()
-        self.fabric_data = open('tests/json-fabric', 'r').read()
+        self.projects = set(['clint', 'todo.py', 'fabric'])
+
+        self.data = {}
+        for p in self.projects:
+            self.data[p] = open('tests/json-{0}'.format(p), 'r').read()
+
+        self.formatted = {}
+        for p in self.projects:
+            self.formatted[p] = open('tests/formatted-{0}'.format(p),
+                    'r').readlines()
+            self.formatted[p] = [l.strip('\n') for l in self.formatted[p]]
+
         super(IssuesParser_Test, self).setUp()
 
-    def test_static_data(self):
-        pass
+    def _parser_equiv_(self, p, parser):
+        parser.format_issues()
+        self.assert_list_items_equivalent(self.formatted[p],
+                parser.get_formatted_items())
+
+
+    def test_initialization(self):
+        for p in self.projects:
+            parser = IssuesParser(self.data[p])
+            self.assertEquals(self.data[p], parser.get_flat_data())
+            self._parser_equiv_(p, parser)
+
+    def test_github_parse(self):
+        gh = GitHub()
+        for p in self.projects:
+            gh.data = self.data[p]
+            parser = IssuesParser()
+            parser.parse(gh)
+            self._parser_equiv_(p, parser)
+
+    def test_data_parse(self):
+        for p in self.projects:
+            parser = IssuesParser()
+            parser.parse(self.data[p])
+            self._parser_equiv_(p, parser)
+
+    def test_get_issue(self):
+        for p in self.projects:
+            parser = IssuesParser(self.data[p])
+            json_list = json.loads(self.data[p])
+            json_dict = {}
+            for l in json_list:
+                self.assertEquals(l, parser.get_issue(l['number']))

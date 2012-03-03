@@ -24,7 +24,7 @@ import sys
 import unittest
 import issues
 
-class BaseCase(unittest.TestCase):
+class Base(unittest.TestCase):
     repositories = {'sigmavirus24': ['Todo.txt-python'], 'kennethreitz':
             ['clint', 'requests', 'httpbin'], 'osteele10': ['jetsam'], 'fabric':
             ['fabric'], 'rupa': ['sprunge'], 'tpope': ['vim-pathogen']}  # More to be added

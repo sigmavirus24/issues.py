@@ -18,12 +18,10 @@
 #
 # TLDR: This is licensed under the GPLv3. See LICENSE for more details.
 
-import unittest
 import base
 from issues import GitHub
 
-
-class GitHub_Test(base.BaseCase):
+class GitHub_Test(base.Base):
     def test_invalid_url(self):
         github = GitHub()
         github.request('http://www.example.com')
@@ -58,11 +56,15 @@ class GitHub_Test(base.BaseCase):
 
 
     def test_valid_repository(self):
-        self.__test_code__('repos/sigmavirus24/issues.py', 200)
+        for (user, repos) in self.repositories.items():
+            for repo in repos:
+                path = 'repos/{u}/{r}'.format(u=user, r=repo)
+                self.__test_code__(path, 200)
 
 
     def test_valid_user(self):
-        self.__test_code__('users/sigmavirus24', 200)
+        for user in self.repositories:
+            self.__test_code__('users/{u}'.format(u=user), 200)
 
 
     def test_set_url(self):

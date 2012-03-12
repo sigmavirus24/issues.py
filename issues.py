@@ -207,6 +207,7 @@ class Issues(object):
         self.user = None
         self.my_issues = None
         self.cached = False
+        self.success = False
 
         if owner and project:
             self.add_project(owner, project)
@@ -279,6 +280,7 @@ class Issues(object):
             f = self.__search_for__(owner, project, cache_dir)
             if self.cached:
                 self.open_cache(f)
+                self.success = True
                 return
 
         url = None
@@ -289,9 +291,14 @@ class Issues(object):
         if self.params:
             url = '?'.join([self.github.geturl(), self.params])
 
+        if not url:
+            print("Error: No url specified.")
+            return
+
         self.github.request(url)
         if self.github.getcode() == 200:
             self.parser.parse(self.github)
+            self.success = True
         else:
             print("{0} error: {1}.".format(self.github.getcode(),
                 self.github.geturl()))
@@ -327,6 +334,9 @@ class Issues(object):
 
     def print_issues(self):
         self.parser.print_issues()
+
+    def successful(self):
+        return self.success
 
 
 # vim:set et;set tw=80

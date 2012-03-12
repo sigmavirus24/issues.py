@@ -39,7 +39,8 @@ class Base(unittest.TestCase):
         self.stdout = self.backupstdout
 
     def add_to_cache(self, filename):
-        self.cache_files.append(filename)
+        if filename not in self.cache_files:
+            self.cache_files.append(filename)
 
     def assert_list_items_equivalent(self, a, b):
         for i in a:
@@ -58,3 +59,8 @@ class Base(unittest.TestCase):
 
     def ghurl(self, string):
         return ''.join([self.api_base, string])
+
+    def iter_repos(self):
+        for (owner, plist) in list(self.repositories.items()):
+            for project in plist:
+                yield (owner, project)

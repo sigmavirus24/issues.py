@@ -264,7 +264,7 @@ class Issues(object):
         with open(filename, 'w+') as fd:
             data = self.parser.get_flat_data()
             if hasattr(data, 'decode'):
-                data = data.decode()
+                data = data.decode('utf-8')
             fd.write(data)
 
     def fetch_issues(self, owner=None, project=None, check_cache=False,

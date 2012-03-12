@@ -49,7 +49,7 @@ class GitHub(object):
             self.req.add_header('Authorization', self.auth)
         try:
             self.response = urlopen(self.req)
-        except HTTPError, error:
+        except HTTPError as error:
             self.response = error
         self.data = self.response.read()
 
@@ -263,7 +263,8 @@ class Issues(object):
 
         with open(filename, 'w+') as fd:
             data = self.parser.get_flat_data()
-            data = data.encode('ascii', 'ignore')
+            if hasattr(data, 'decode'):
+                data = data.decode()
             fd.write(data)
 
     def fetch_issues(self, owner=None, project=None, check_cache=False,

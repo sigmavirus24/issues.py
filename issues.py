@@ -121,7 +121,7 @@ class IssuesParser(object):
         """Parse the data which must be a string at this point."""
         self.flat_data = data
         if isinstance(data, bytes):
-            self.flat_data = data.decode('utf-8')
+            self.flat_data = data.decode('utf-8', 'ignore')
         self.structured_data = json.loads(self.flat_data)
         for d in self.structured_data:
             self.issues_dict[d['number']] = d

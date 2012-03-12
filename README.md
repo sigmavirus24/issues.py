@@ -18,7 +18,7 @@ None.
 I could have used Kenneth Reitz's great
 [requests](https://github.com/kennethreitz/requests) module for this, but I
 wanted to have as few dependencies as possible. If someone else wants to do
-this using his module, they fork this and integrate that.
+this using his module, they can fork this and integrate that.
 
 ## Goals
 

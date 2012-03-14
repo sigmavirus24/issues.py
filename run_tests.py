@@ -41,3 +41,7 @@ if __name__ == "__main__":
 
     print("=== START TEST SUITE ===")
     unittest.TextTestRunner(verbosity=2).run(suite)
+
+    for f in os.listdir("./"):
+        if f.endswith('.json'):
+            os.unlink(f)

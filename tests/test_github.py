@@ -75,7 +75,6 @@ class GitHub_Test(base.Base):
 
     def test_auth(self):
         auth = ('sigmavirus24', 'fakepassword')
-        oauth = 'oauth_token_clearly_not_real'
         # Basic Authentication at initialization
         github = GitHub(*auth)
         self.assertTrue(github.using_auth())
@@ -83,11 +82,4 @@ class GitHub_Test(base.Base):
         github = GitHub()
         self.assertFalse(github.using_auth())
         github.add_basic_auth(*auth)
-        self.assertTrue(github.using_auth())
-        # OAuth Authorization at initialization
-        github = GitHub(oauth_token=oauth)
-        self.assertTrue(github.using_auth())
-        # OAuth Authorization after initialization
-        github = GitHub()
-        github.add_oauth(oauth)
         self.assertTrue(github.using_auth())

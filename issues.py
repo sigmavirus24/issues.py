@@ -31,7 +31,7 @@ from base64 import b64encode
 class GitHub(object):
     """Basic API Interface."""
 
-    def __init__(self, user=None, pw=None, oauth_token=None):
+    def __init__(self, user=None, pw=None):
         self.req = None
         self.auth = None
         self.last_url = None
@@ -40,8 +40,6 @@ class GitHub(object):
         self.response = None
         if user and pw:
             self.add_basic_auth(user, pw)
-        elif oauth_token:
-            self.add_oauth(oauth_token)
 
     def __request__(self):
         self.req = Request(self.last_url)
@@ -57,10 +55,6 @@ class GitHub(object):
         """Adds basic authentication to the object."""
         joined = b64encode(':'.join([user, pw]).encode()).decode()
         self.auth = ' '.join(['Basic', joined])
-
-    def add_oauth(self, oauth_token):
-        """Adds oauth authentication to the object."""
-        self.auth = ' '.join(['token', oauth_token])
 
     def getcode(self):
         """Return the code from the last request."""
@@ -198,8 +192,7 @@ class IssuesParser(object):
 class Issues(object):
     """Provides an easy interface to the Issues list."""
 
-    def __init__(self, owner=None, project=None, user=None, pw=None,
-            oauth_token=None):
+    def __init__(self, owner=None, project=None, user=None, pw=None):
         self.github = GitHub()
         self.parser = IssuesParser()
         self.owner = None
@@ -213,8 +206,6 @@ class Issues(object):
             self.add_project(owner, project)
         if user and pw:
             self.add_myself(user, pw)
-        if oauth_token:
-            self.github.add_oauth(oauth_token)
         self.__set_default_url__()
 
     def __search_for__(self, owner, project, cache_dir):

@@ -1,8 +1,7 @@
 issues.py
 =========
 
-.. image:: 
-https://secure.travis-ci.org/sigmavirus24/issues.py.png?branch=master
+.. image:: https://secure.travis-ci.org/sigmavirus24/issues.py.png?branch=master
     :alt: Build Status
     :target: http://travis-ci.org/sigmavirus24/issues.py
 

@@ -3,5 +3,6 @@
 *.swp
 __pycache__/*
 build/
+docs/_build/
 dist/
 *.egg-info/

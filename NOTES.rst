@@ -53,23 +53,19 @@ And projects should look like this
 ::
 
     {
-        "projects": [
-            {
-                "sigmavirus24": [
-                    "Todo.txt-python",
-                    "github3.py",
-                    "issues.py",
-                    "sprunge.py"
-                ]
-            },
-            {
-                "kennethreitz": [
-                    "requests",
-                    "clint",
-                    "args"
-                ]
-            }
-        ]
+        "projects": {
+            "sigmavirus24": [
+                "Todo.txt-python",
+                "github3.py",
+                "issues.py",
+                "sprunge.py"
+            ],
+            "kennethreitz": [
+                "requests",
+                "clint",
+                "args"
+            ]
+        }
     }
 
 A Complete Config File Example
@@ -82,21 +78,17 @@ A Complete Config File Example
             "username": "sigmavirus24",
             "password": "foobar_bogus",
         },
-        "projects": [
-            {
-                "sigmavirus24": [
-                    "Todo.txt-python",
-                    "github3.py",
-                    "issues.py",
-                    "sprunge.py"
-                ]
-            },
-            {
-                "kennethreitz": [
-                    "requests",
-                    "clint",
-                    "args"
-                ]
-            }
-        ]
+        "projects": {
+            "sigmavirus24": [
+                "Todo.txt-python",
+                "github3.py",
+                "issues.py",
+                "sprunge.py"
+            ],
+            "kennethreitz": [
+                "requests",
+                "clint",
+                "args"
+            ]
+        }
     }

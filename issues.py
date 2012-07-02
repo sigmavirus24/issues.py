@@ -61,11 +61,10 @@ def read_config(config_file='', username=''):
     auth = options.get('auth', {})
     config.update(auth)
 
-    projs = options.get('projects', [])
-    for d in projs:
-        for (k, v) in d.items():
-            p = [(k, p) for p in v]
-            config['projects'].extend(p)
+    projs = options.get('projects', {})
+    for (k, v) in projs.items():
+        p = [(k, p) for p in v]
+        config['projects'].extend(p)
 
 
 def list_all():
@@ -88,6 +87,11 @@ def main():
     if (config['username'] and config['password']) or config['oauth']:
         config['github'] = login(config['username'], config['password'], 
                 config['oauth'])
+    elif config['username'] and not config['password']:
+        while not config['password']:
+            pass_str = 'Password for {0}: '.format(config['username'])
+            config['password'] = getpass(pass_str)
+        config['github'] = login(config['username'], config['password'])
     else:
         config['github'] = GitHub()
 

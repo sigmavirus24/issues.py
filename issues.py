@@ -70,7 +70,14 @@ def read_config(config_file='', username=''):
 
 def list_all():
     """List every open issue on every project desired"""
-    pass
+    if not any(config['projects']):
+        return
+
+    for (owner, project) in config['projects']:
+        print('----{0}/{1}:'.format(owner, project))
+        for issue in config['github'].list_issues(owner, project):
+            print(format_issue(issue))
+        print('----')
 
 
 def main():

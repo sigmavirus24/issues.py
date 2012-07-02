@@ -51,16 +51,16 @@ I'm going to write it so that the following is a valid configuration file:
     pass = fakepassword1234567890
     
     [sigmavirus24]
-    Todo.txt-python
-    issues.py
-    github3.py
+    Todo.txt-python = 1
+    issues.py = 1
+    github3.py = 1
     
     [kennethreitz]
-    clint
-    requests
-    httpbin
+    clint = 1
+    requests = 1
+    httpbin = 1
     
     [fabric]
-    fabric
+    fabric = 1
 
 It's clean and more obvious in my humble opinion.

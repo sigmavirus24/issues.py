@@ -1,7 +1,9 @@
+#!/usr/bin/env python
+
 from optparse import OptionParser
 from github3 import login, GitHub
 from getpass import getpass
-from ConfigParser import ConfigParser
+import json
 import os
 
 __version__ = '0.1a'
@@ -12,7 +14,6 @@ __author__ = 'Ian Cordasco'
 #  projects should be in the form ('owner', 'name') and will be read from both
 #  the command line and configuration file.
 config = {
-        'anonymous': True,
         'username': '',
         'password': '',
         'oauth': '',
@@ -42,51 +43,29 @@ def initialize_opts():
     return opts
 
 
-def read_config(config='', username=''):
+def read_config(config_file='', username=''):
     """Read the configuration file.
 
     :param config: (optional), path to the configuration file to use,
         default: $HOME/.issuesrc
     :type config: str
     """
-    config = config or os.path.join(os.environ['HOME'], '.issuesrc')
-    parser = ConfigParser()
-    with open(config, 'r') as fd:
-        parser.readfp(fd, config)
-        sections = parser.sections()
+    config_file = config_file or os.path.join(os.environ['HOME'], '.issuesrc')
+    options = None
+    with open(config_file, 'r') as fd:
+        options = json.load(fd)
 
-        # Get the authentication information
-        if 'auth' in sections:
-            sections.remove('auth')
-            # Command-line options should override the config file
-            if not username and parser.has_option('auth', 'username'):
-                config['username'] = parser.get('auth', 'username')
-            elif username:
-                config['username'] = username
+    if not options:
+        return
 
-            # In case someone doesn't like putting their password in 
-            # plain-text into a file on their computer (which I 
-            # **completely**) understand.
-            if parser.has_option('auth', 'password'):
-                config['password'] = parser.get('auth', 'password')
+    auth = options.get('auth', {})
+    config.update(auth)
 
-            # Check for oauth token
-            if parser.has_option('auth', 'oauth'):
-                config['oauth'] = parser.get('auth', 'oauth')
-
-        if config['username']:
-            config['anonymous'] = False
-
-        # If we only have half of the authorization...
-        if config['username'] and not config['password']:
-            fs = 'Password for {0}: '.format(config['username'])
-            # Be persistent
-            while not config['password']:
-                config['password'] = getpass(fs)
-
-        for sect in sections:
-            projects = [(sect, proj) for (proj, _) in parser.items(sect)]
-            config['projects'].extend(projects)
+    projs = options.get('projects', [])
+    for d in projs:
+        for (k, v) in d.items():
+            p = [(k, p) for p in v]
+            config['projects'].extend(p)
 
 
 def list_all():
@@ -97,7 +76,7 @@ def list_all():
 def main():
     opts = initialize_opts()
     (valid, args) = opts.parse_args()
-    read_config(valid.conf)
+    read_config(valid.conf, valid.user)
 
     # Setup our GitHub object
     if (config['username'] and config['password']) or config['oauth']:
@@ -109,3 +88,7 @@ def main():
     # If no command was issues, let's simply list everything
     if not args:
         list_all()
+
+
+if __name__ == '__main__':
+    main()

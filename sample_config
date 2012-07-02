@@ -1,0 +1,22 @@
+{
+    "auth": {
+        "username": "sigmavirus24"
+    },
+    "projects": [
+        {
+            "sigmavirus24": [
+                "Todo.txt-python",
+                "github3.py",
+                "issues.py",
+                "sprunge.py"
+            ]
+        },
+        {
+            "kennethreitz": [
+                "requests",
+                "args",
+                "clint"
+            ]
+        }
+    ]
+}

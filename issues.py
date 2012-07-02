@@ -77,7 +77,6 @@ def list_all():
         print('----{0}/{1}:'.format(owner, project))
         for issue in config['github'].list_issues(owner, project):
             print(format_issue(issue))
-        print('----')
 
 
 def main():

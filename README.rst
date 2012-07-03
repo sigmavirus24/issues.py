@@ -12,7 +12,7 @@ as a module presently and in the future as well probably. It works on Python
 2.6-3.x.
 
 .. links
-.. _todo.py: (http://git.io/todo.py)
+.. _todo.py: http://git.io/todo.py
 
 Dependencies
 ------------
@@ -27,13 +27,13 @@ Goals
 - Python 2.6 thru 3.2 (and maybe even 3.3) compatibility
 - Easy management of issues
 
-    - Closing
-    - Commenting
-    - Merging (pull requests only)
-    - Re-opening
-    - Listing
-    - Getting details
-    - Viewing comments
+  - Closing
+  - Commenting
+  - Merging (pull requests only)
+  - Re-opening
+  - Listing
+  - Getting details
+  - Viewing comments
 
 License
 -------

@@ -6,7 +6,7 @@ from getpass import getpass
 import json
 import os
 
-__version__ = '0.1a'
+__version__ = '0.0a'
 __author__ = 'Ian Cordasco'
 
 #: Dictionary holding the basic configuration for the script. By default the

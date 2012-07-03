@@ -52,8 +52,9 @@ def read_config(config_file='', username=''):
     """
     config_file = config_file or os.path.join(os.environ['HOME'], '.issuesrc')
     options = None
-    with open(config_file, 'r') as fd:
-        options = json.load(fd)
+    if os.path.exists(config_file):
+        with open(config_file, 'r') as fd:
+            options = json.load(fd)
 
     if not options:
         return

@@ -78,6 +78,37 @@ def list_all():
             print(format_issue(issue))
 
 
+def list_comments(args):
+    """List comments on an issue.
+
+    :param args: owner, repo, number
+    :type args: list
+    """
+    args = args or []
+    comments = []
+    if any(args) and len(args) == 3:
+        issue = config['github'].issue(args[0], args[1], args[2])
+        comments = issue.list_comments()
+
+    fs = '@{0}:------------'
+    for c in comments:
+        print(fs.format(c.user.login))
+        print(c.body)
+
+
+def more_info(args):
+    """Get more information about a particular issue on a repository.
+
+    :param args: owner, repo, number
+    :type args: list
+    """
+    args = args or []
+    if any(args) and len(args) == 3:
+        issue = config['github'].issue(args[0], args[1], args[2])
+        print(format_issue(issue))
+        print(issue.body)
+
+
 def main():
     opts = initialize_opts()
     (valid, args) = opts.parse_args()
@@ -98,6 +129,19 @@ def main():
     # If no command was issues, let's simply list everything
     if not args:
         list_all()
+        return
+
+    command = args.pop(0)
+    if command in commands:
+        commands[command](args)
+
+
+commands = {
+        'more': more_info,
+        'info': more_info,
+        'listcomments': list_comments,
+        'lsc': list_comments,
+        }
 
 
 if __name__ == '__main__':

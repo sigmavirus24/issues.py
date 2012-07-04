@@ -13,15 +13,9 @@ if sys.argv[-1] in ("submit", "publish"):
     os.system("python setup.py sdist upload")
     sys.exit()
 
-packages = []
 requires = ['github3.py>=0.1a1']
 
 script = 'issues.py'
-#entry_points = {
-#        'console_scripts': [
-#            'issues.py = bin.issues:main',
-#            ]
-#        }
 
 __version__ = ''
 with open(script, 'r') as fd:
@@ -59,5 +53,4 @@ setup(
         ),
     install_requires=requires,
     scripts=[script],
-    # entry_points=entry_points,
     )

@@ -3,6 +3,7 @@
 from optparse import OptionParser
 from github3 import login, GitHub
 from getpass import getpass
+import sys
 import json
 import os
 
@@ -21,6 +22,18 @@ config = {
         'github': None,
         }
 
+
+# I'm using this from todo.py (http://git.io/todo.py) because it gets the job 
+# done
+def usage(*args):
+    """Set the usage string printed out in help."""
+    def usage_decorator(func):
+        """Function that actually sets the usage string."""
+        func.__usage__ = '\n'.join(args).expandtabs(3)
+        return func
+    return usage_decorator
+
+
 def format_issue(issue):
     """Format an issue for printing
 
@@ -33,9 +46,44 @@ def format_issue(issue):
     return fs.format(i=issue, u=issue.user, r=issue.repository)
 
 
+def get_issue(args):
+    """Handle the cases for retrieving a single issue.
+
+    :param args: should be a tuple, e.g., ('owner', 'repo', 'number'),
+        ('owner/repo', 'number'), ('repo', 'number), or even
+        ('owner/repo#number')
+    :returns: :class:`Issue <github3.issue.Issue>`
+    """
+    proj = ()
+    num = 0
+    _get = config['github'].issue
+    if any(args) and len(args) == 3:
+        proj = (args[0], args[1])
+        num = args[-1]
+    elif any(args) and len(args) == 2:
+        if '/' in arg[s0]:
+            proj = args[0].split('/')
+        elif config['username']:
+            proj = (config['username'], args[0])
+        num = args[-1]
+    elif any(args) and len(args) == 1:
+        if '#' in args[0]:
+            (args, num) = args[0].split('#')
+        if '/' in args:
+            proj = args.split('/')
+        elif config['username']:
+            proj = (config['username'], args)
+
+    if proj:
+        return _get(proj[0], proj[1], num)
+    return None
+
+
 def initialize_opts():
     """Initialize the command-line options."""
     opts = OptionParser('Usage: %prog [options] actions [arg(s)]')
+    #opts.remove_option('-h')
+    #opts.add_option('-h', '--help', action='callback', callback=print_help)
     opts.add_option('-c', '--config', dest='conf', default='', type='string',
             nargs=1, help='Configuration file to read')
     opts.add_option('-u', '--username', dest='user', default='',
@@ -64,13 +112,19 @@ def read_config(config_file='', username=''):
 
     projs = options.get('projects', {})
     for (k, v) in projs.items():
-        p = [(k, p) for p in v]
-        config['projects'].extend(p)
+        projs = [(k, p) for p in v]
+        config['projects'].extend(projs)
 
 
-def list_all():
+### Commands
+@usage('\tlistall | lsa', '\t\t' +\
+        'List every open issue on every project listed in the config file\n')
+def list_all(args):
     """List every open issue on every project desired"""
     if not any(config['projects']):
+        return
+
+    if args:
         return
 
     for (owner, project) in config['projects']:
@@ -78,18 +132,18 @@ def list_all():
         for issue in config['github'].list_issues(owner, project):
             print(format_issue(issue))
 
-
+@usage('\tlistcomments | lsco owner repo issue',
+        '\t\tList comments on :owner/:repo#:issue.\n')
 def list_comments(args):
     """List comments on an issue.
 
     :param args: owner, repo, number
     :type args: list
     """
-    args = args or []
-    comments = []
-    if any(args) and len(args) == 3:
-        issue = config['github'].issue(args[0], args[1], args[2])
-        comments = issue.list_comments()
+    args = args or ()
+    issue = get_issue(args)
+
+    comments = issue.list_comments()
 
     fs = '@{0}:------------'
     for c in comments:
@@ -97,17 +151,33 @@ def list_comments(args):
         print(c.body)
 
 
+@usage('\tmore | info owner repo issue',
+        '\t\tRetrieve more information about the issue\n')
 def more_info(args):
     """Get more information about a particular issue on a repository.
 
     :param args: owner, repo, number
     :type args: list
     """
-    args = args or []
-    if any(args) and len(args) == 3:
-        issue = config['github'].issue(args[0], args[1], args[2])
+    args = args or ()
+    issue = get_issue(args)
+    if issue:
         print(format_issue(issue))
         print(issue.body)
+
+
+@usage('\thelp', '\t\tPrint this message\n')
+def print_help(*args):
+    """Function triggered by 'help' and '-h/--help'."""
+    print('Usage: {0} [options] [command [args]]\n'.format(sys.argv[0]))
+    visited = []
+    for key in sorted(commands.keys()):
+        func = commands[key]
+        if func not in visited:
+            print(func.__usage__)
+            visited.append(func)
+    sys.exit(0)
+### End Commands
 
 
 def main():
@@ -141,7 +211,9 @@ commands = {
         'more': more_info,
         'info': more_info,
         'listcomments': list_comments,
-        'lsc': list_comments,
+        'lscm': list_comments,
+        #'comment': comment,
+        'help': print_help,
         }
 
 
